@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Utilitários V8 · José Neto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Great+Vibes&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  :root{
+    --bg:#0a1428;
+    --bg-2:#0f1d3a;
+    --card:#172446;
+    --card-2:#1d2c54;
+    --border:#2a3a66;
+    --text:#e6ecf5;
+    --text-dim:#8b9bbf;
+    --text-soft:#aab5d1;
+    --green:#10b981;
+    --green-2:#34d399;
+    --accent:#5b8def;
+  }
+  html,body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+  body{padding-bottom:env(safe-area-inset-bottom)}
+  .cursive{font-family:'Great Vibes','Sacramento',cursive;font-weight:400}
+
+  /* ===== HEADER ===== */
+  .header{
+    background:var(--bg);
+    padding:14px 18px;
+    border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:12px;
+    position:sticky;top:0;z-index:50;
+    padding-top:calc(14px + env(safe-area-inset-top))
+  }
+  .logo-n{
+    width:44px;height:44px;border-radius:11px;
+    background:linear-gradient(135deg,var(--green),var(--green-2));
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:22px;color:#062619;
+    box-shadow:0 4px 14px rgba(16,185,129,0.35);
+    flex-shrink:0
+  }
+  .header-text{flex:1;min-width:0}
+  .header-title{font-size:17px;font-weight:700;letter-spacing:-0.3px}
+  .header-name{font-size:24px;color:var(--text-soft);margin-top:-3px;line-height:1}
+
+  /* ===== TELA ===== */
+  .screen{padding:18px;display:none}
+  .screen.active{display:block}
+
+  /* ===== TELA INICIAL ===== */
+  .hero-title{font-size:28px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+  .hero-sub{color:var(--text-dim);font-size:14px;margin-bottom:18px}
+
+  .search-bar{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:12px 16px;display:flex;align-items:center;gap:10px;margin-bottom:20px
+  }
+  .search-bar input{
+    background:transparent;border:none;outline:none;color:var(--text);
+    font-size:15px;flex:1;font-family:inherit
+  }
+  .search-bar input::placeholder{color:var(--text-dim)}
+
+  .section-label{
+    font-size:11px;font-weight:700;color:var(--text-dim);
+    letter-spacing:1.5px;text-transform:uppercase;margin:18px 4px 10px
+  }
+
+  .tool-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tool-card{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    padding:14px 12px;cursor:pointer;transition:all 0.15s;
+    display:flex;flex-direction:column;gap:6px;min-height:88px;
+    position:relative;overflow:hidden
+  }
+  .tool-card:active{background:var(--card-2);transform:scale(0.97)}
+  .tool-card .icon{font-size:22px;line-height:1}
+  .tool-card .name{font-size:13px;font-weight:700;line-height:1.25}
+  .tool-card .desc{font-size:10.5px;color:var(--text-dim);line-height:1.3}
+  .tool-card.fav .star{
+    position:absolute;top:8px;right:10px;color:#fbbf24;font-size:12px
+  }
+
+  /* ===== TELA DE FERRAMENTA ===== */
+  .back-btn{
+    background:transparent;border:none;color:var(--text-soft);font-size:14px;
+    cursor:pointer;padding:0 0 14px 0;display:flex;align-items:center;gap:6px;
+    font-family:inherit
+  }
+  .back-btn:active{color:var(--text)}
+  .tool-title{font-size:24px;font-weight:800;letter-spacing:-0.4px}
+  .tool-desc{color:var(--text-dim);font-size:13.5px;margin-top:4px;line-height:1.45;margin-bottom:18px}
+
+  /* ===== FORM ===== */
+  .form-card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;
+    margin-bottom:14px
+  }
+  .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+  .form-row:last-child{margin-bottom:0}
+  .form-label{font-size:13px;font-weight:600;color:var(--text-soft)}
+  .form-input, .form-select{
+    background:var(--card-2);border:1px solid var(--border);border-radius:11px;
+    padding:13px 14px;color:var(--text);font-size:15px;font-family:inherit;
+    font-weight:600;outline:none;transition:border 0.15s;
+    width:100%;
+    -webkit-appearance:none;appearance:none
+  }
+  .form-input:focus, .form-select:focus{border-color:var(--accent)}
+  .form-input::placeholder{color:var(--text-dim);font-weight:500}
+  .form-select{
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3e%3cpath d='M3 4.5L6 7.5L9 4.5' stroke='%238b9bbf' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:36px
+  }
+  .form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  .calc-btn{
+    width:100%;background:linear-gradient(135deg,var(--green),var(--green-2));
+    color:#062619;border:none;border-radius:12px;padding:14px;
+    font-weight:800;font-size:14px;letter-spacing:0.5px;cursor:pointer;
+    font-family:inherit;margin-top:6px;
+    box-shadow:0 4px 14px rgba(16,185,129,0.3)
+  }
+  .calc-btn:active{transform:scale(0.98)}
+
+  /* RESULTADO */
+  .result-card{
+    background:linear-gradient(135deg,#0f1d3a,#172446);
+    border:1px solid var(--accent);border-radius:16px;padding:18px;margin-top:14px;
+    display:none
+  }
+  .result-card.show{display:block;animation:slideUp 0.25s ease-out}
+  @keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .result-title{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+  .result-main{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1.1}
+  .result-unit{font-size:14px;color:var(--text-soft);font-weight:600;margin-left:6px}
+  .result-row{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:9px 0;border-bottom:1px solid var(--border);font-size:13px
+  }
+  .result-row:last-child{border-bottom:none}
+  .result-row .lbl{color:var(--text-dim);font-weight:600}
+  .result-row .val{color:var(--text);font-weight:700}
+
+  .hint{
+    font-size:12px;color:var(--text-dim);font-style:italic;
+    text-align:center;padding:10px;line-height:1.5
+  }
+
+  /* TABELA */
+  .table-wrap{
+    background:var(--card);border:1px solid var(--border);border-radius:14px;
+    overflow:hidden;margin-bottom:14px
+  }
+  .tbl{width:100%;border-collapse:collapse;font-size:12px}
+  .tbl th{
+    background:var(--card-2);color:var(--text-soft);font-weight:700;
+    text-align:left;padding:11px 10px;border-bottom:1px solid var(--border);
+    font-size:10.5px;letter-spacing:0.5px;text-transform:uppercase
+  }
+  .tbl td{padding:10px;border-bottom:1px solid var(--border);color:var(--text);font-weight:500}
+  .tbl tr:last-child td{border-bottom:none}
+  .tbl tr:nth-child(even) td{background:rgba(0,0,0,0.15)}
+
+  .footer{
+    text-align:right;padding:24px 18px 22px;color:var(--text-dim);
+    font-size:12px;border-top:1px solid var(--border);margin-top:20px
+  }
+  .footer .sig{font-size:32px;color:var(--text-soft);display:block;margin-top:4px;line-height:1}
+  .sig-cursive{font-family:'Great Vibes',cursive;font-size:46px;color:var(--text);line-height:1;margin:4px 0 2px;font-weight:400;letter-spacing:0.5px}
+  .footer .note{font-size:10.5px;margin-top:8px;font-style:italic;text-align:right}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-n">N</div>
+  <div class="header-text">
+    <div class="header-title" style="font-size:19px">Utilitários V8</div>
+  </div>
+</div>
+
+<!-- ============ TELA INICIAL ============ -->
+<div class="screen active" id="screen-home">
+  <div class="hero-title">Ferramentas</div>
+  <div class="hero-sub">Cálculos e tabelas para operações de poços</div>
+
+  <div class="search-bar">
+    <span style="color:var(--text-dim);font-size:16px">🔍</span>
+    <input type="text" id="busca" placeholder="Buscar ferramenta..." oninput="filtrarFerramentas()">
+  </div>
+
+  <div class="section-label" id="lbl-favoritas">★ Favoritas</div>
+  <div class="tool-grid" id="grid-favoritas"></div>
+
+  <div class="section-label">🧮 Calculadoras</div>
+  <div class="tool-grid" id="grid-calc"></div>
+
+  <div class="section-label">📊 Tabelas de Referência</div>
+  <div class="tool-grid" id="grid-tabelas"></div>
+
+  <div class="section-label">🔄 Conversões</div>
+  <div class="tool-grid" id="grid-conv"></div>
+</div>
+
+<!-- ============ TELA DE FERRAMENTA ============ -->
+<div class="screen" id="screen-tool">
+  <button class="back-btn" onclick="voltar()">‹ Voltar</button>
+  <div id="tool-content"></div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div style="font-size:11px;color:var(--text-dim);margin-bottom:4px">IDs API 5CT</div>
+  <div class="sig-cursive">José Neto</div>
+  <div class="note">Confira valores críticos antes de aplicar em campo.</div>
+</div>
+
+<script>
+// =================== DADOS TÉCNICOS ===================
+// Tabela de Revestimento — diâmetro nominal × peso → ID (in)
+const REVESTIMENTOS = {
+  "4 1/2": {od: 4.5, pesos: {9.5:4.090, 10.5:4.052, 11.6:4.000, 12.6:3.958, 13.5:3.920, 15.1:3.826, 16.6:3.754, 17.7:3.696, 18.8:3.640, 20.0:3.640, 21.6:3.500}},
+  "5":     {od: 5.0, pesos: {11.5:4.560, 13.0:4.494, 15.0:4.408, 18.0:4.276, 20.3:4.184, 20.8:4.156, 21.4:4.126, 23.2:4.044, 24.1:4.000}},
+  "5 1/2": {od: 5.5, pesos: {13.0:5.044, 14.0:5.012, 15.5:4.950, 17.0:4.892, 20.0:4.778, 23.0:4.670, 26.0:4.548}},
+  "6 5/8": {od: 6.625, pesos: {17.0:6.135, 20.0:6.049, 24.0:5.921, 28.0:5.791, 32.0:5.675}},
+  "7":     {od: 7.0, pesos: {17.0:6.538, 20.0:6.456, 23.0:6.366, 26.0:6.276, 29.0:6.184, 32.0:6.094, 35.0:6.004, 38.0:5.920}},
+  "7 5/8": {od: 7.625, pesos: {20.0:7.125, 24.0:7.025, 26.4:6.969, 29.7:6.875, 33.7:6.765, 39.0:6.625}},
+  "8 5/8": {od: 8.625, pesos: {24.0:8.097, 28.0:8.017, 32.0:7.921, 36.0:7.825, 40.0:7.725, 44.0:7.625, 49.0:7.511}},
+  "9 5/8": {od: 9.625, pesos: {32.3:9.001, 36.0:9.001, 40.0:8.835, 43.5:8.755, 47.0:8.681, 53.5:8.535, 58.4:8.435}},
+  "10 3/4":{od: 10.75, pesos: {32.75:10.192, 40.5:10.050, 45.5:9.950, 51.0:9.850, 55.5:9.760, 60.7:9.660, 65.7:9.560}},
+  "11 3/4":{od: 11.75, pesos: {42.0:11.084, 47.0:11.000, 54.0:10.880, 60.0:10.772, 65.0:10.682}},
+  "13 3/8":{od: 13.375, pesos: {48.0:12.715, 54.5:12.615, 61.0:12.515, 68.0:12.415, 72.0:12.347}}
+};
+
+// Tubos de Produção (API 5CT) — OD nominal → variações
+const TUBOS_PROD = {
+  "1.050":  {od:1.050, pesos:{1.14:0.824, 1.20:0.824}},
+  "1.315":  {od:1.315, pesos:{1.70:1.049, 1.80:1.049}},
+  "1.660":  {od:1.660, pesos:{2.30:1.380, 2.40:1.380}},
+  "1.900":  {od:1.900, pesos:{2.75:1.610, 2.90:1.610}},
+  "2 3/8":  {od:2.375, pesos:{4.00:2.041, 4.60:1.995, 4.70:1.995, 5.80:1.867, 5.95:1.867}},
+  "2 7/8":  {od:2.875, pesos:{6.40:2.441, 6.50:2.441, 7.80:2.323, 7.90:2.323, 8.60:2.259, 8.70:2.259}},
+  "3 1/2":  {od:3.500, pesos:{7.70:3.068, 9.20:2.992, 9.30:2.992, 10.20:2.922, 12.70:2.750, 12.95:2.750}},
+  "4":      {od:4.000, pesos:{9.50:3.548, 11.00:3.476, 13.20:3.340}},
+  "4 1/2":  {od:4.500, pesos:{12.60:3.958, 12.75:3.958, 15.20:3.826, 17.00:3.740}}
+};
+
+// =================== FERRAMENTAS ===================
+const FERRAMENTAS = [
+  // CALCULADORAS
+  {id:"volumes",        cat:"calc",   icon:"📦", nome:"Volumes",                desc:"Volume rev. + tubo + anular"},
+  {id:"capacidades",    cat:"calc",   icon:"📏", nome:"Capacidades",            desc:"Interna / anular (bbl/m)"},
+  {id:"amort1",         cat:"calc",   icon:"💧", nome:"Amortecimento 1",        desc:"Por pressão de formação"},
+  {id:"amort2",         cat:"calc",   icon:"💧", nome:"Amortecimento 2",        desc:"Por gradiente"},
+  {id:"vazaoCirc",      cat:"calc",   icon:"🌊", nome:"Vazão Circulação",       desc:"ID × velocidade"},
+  {id:"vazaoDiaria",    cat:"calc",   icon:"📈", nome:"Vazão Diária",           desc:"Produção em bbl/d"},
+  {id:"difPressao",     cat:"calc",   icon:"⚖️", nome:"Diferencial Pressão",    desc:"ΔP entre 2 pontos"},
+  {id:"flutuacao",      cat:"calc",   icon:"🪶", nome:"Fator de Flutuação",     desc:"FF = 1 − ρf/ρaço"},
+  {id:"slackoff",       cat:"calc",   icon:"⬇️", nome:"Slack-Off",              desc:"Peso pra assentamento"},
+  {id:"colchaoAreia",   cat:"calc",   icon:"⏳", nome:"Colchão de Areia",       desc:"Volume p/ colchão"},
+  {id:"pinoCisalha",    cat:"calc",   icon:"🔩", nome:"Pinos Cisalhamento",     desc:"Força de cisalha"},
+  // TABELAS
+  {id:"tabRev",         cat:"tabela", icon:"⚙️", nome:"Revestimentos",          desc:"OD, peso, ID, drift"},
+  {id:"tabTubos",       cat:"tabela", icon:"🔧", nome:"Tubos de Produção",      desc:"API 5CT — todos os pesos"},
+  {id:"tabBrocas",      cat:"tabela", icon:"⛏️", nome:"Brocas",                  desc:"Por revestimento"},
+  {id:"tabPacker",      cat:"tabela", icon:"🟫", nome:"Packers",                desc:"Tipo por OD/peso"},
+  // CONVERSÕES
+  {id:"conversoes",     cat:"conv",   icon:"🔄", nome:"Conversões",             desc:"psi · m · bbl · lb"}
+];
+
+// =================== FAVORITOS ===================
+const FAVORITOS_PADRAO = ["volumes","capacidades","amort1","vazaoCirc"];
+let favoritos = JSON.parse(localStorage.getItem('utilv3-favs') || JSON.stringify(FAVORITOS_PADRAO));
+const isFav = id => favoritos.includes(id);
+function toggleFav(id) {
+  if (isFav(id)) favoritos = favoritos.filter(f => f !== id);
+  else favoritos.push(id);
+  localStorage.setItem('utilv3-favs', JSON.stringify(favoritos));
+  renderHome();
+}
+
+// =================== HOME ===================
+function renderHome() {
+  const favs = FERRAMENTAS.filter(f => isFav(f.id));
+  document.getElementById('lbl-favoritas').style.display = favs.length ? '' : 'none';
+  document.getElementById('grid-favoritas').innerHTML = favs.map(cardHTML).join('');
+  document.getElementById('grid-calc').innerHTML = FERRAMENTAS.filter(f => f.cat==='calc').map(cardHTML).join('');
+  document.getElementById('grid-tabelas').innerHTML = FERRAMENTAS.filter(f => f.cat==='tabela').map(cardHTML).join('');
+  document.getElementById('grid-conv').innerHTML = FERRAMENTAS.filter(f => f.cat==='conv').map(cardHTML).join('');
+}
+function cardHTML(f) {
+  return `<div class="tool-card ${isFav(f.id)?'fav':''}" onclick="abrirFerramenta('${f.id}')">
+    ${isFav(f.id)?'<span class="star">★</span>':''}
+    <div class="icon">${f.icon}</div>
+    <div class="name">${f.nome}</div>
+    <div class="desc">${f.desc}</div>
+  </div>`;
+}
+
+function filtrarFerramentas() {
+  const q = document.getElementById('busca').value.toLowerCase().trim();
+  if (!q) { renderHome(); return; }
+  const filtrado = FERRAMENTAS.filter(f => f.nome.toLowerCase().includes(q) || f.desc.toLowerCase().includes(q));
+  document.getElementById('lbl-favoritas').style.display = 'none';
+  document.getElementById('grid-favoritas').innerHTML = '';
+  document.getElementById('grid-calc').innerHTML = filtrado.filter(f => f.cat==='calc').map(cardHTML).join('');
+  document.getElementById('grid-tabelas').innerHTML = filtrado.filter(f => f.cat==='tabela').map(cardHTML).join('');
+  document.getElementById('grid-conv').innerHTML = filtrado.filter(f => f.cat==='conv').map(cardHTML).join('');
+}
+
+// =================== NAVEGAÇÃO ===================
+function abrirFerramenta(id) {
+  document.getElementById('screen-home').classList.remove('active');
+  document.getElementById('screen-tool').classList.add('active');
+  const cont = document.getElementById('tool-content');
+  const f = FERRAMENTAS.find(x => x.id===id);
+  const favBtn = `<button onclick="toggleFav('${id}');renderHome();abrirFerramenta('${id}')" style="background:transparent;border:1px solid var(--border);color:${isFav(id)?'#fbbf24':'var(--text-dim)'};padding:5px 11px;border-radius:9px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600">${isFav(id)?'★ Favorita':'☆ Favoritar'}</button>`;
+  cont.innerHTML = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px">
+      <div style="flex:1">
+        <div class="tool-title">${f.icon} ${f.nome}</div>
+      </div>
+      ${favBtn}
+    </div>
+  ` + RENDERIZADORES[id]();
+  window.scrollTo(0,0);
+}
+function voltar() {
+  document.getElementById('screen-tool').classList.remove('active');
+  document.getElementById('screen-home').classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// =================== UTILS ===================
+const fmt = (n, casas=2) => {
+  if (!isFinite(n)) return '—';
+  return n.toLocaleString('pt-BR', {minimumFractionDigits:casas, maximumFractionDigits:casas});
+};
+const pol2cm = p => p * 2.54;
+const m2pe = m => m / 0.3048;
+
+// Capacidade interna em bbl/m a partir do ID em polegadas
+// Fórmula: V (bbl/m) = π × (ID²/4) × 0.3048 / 158.987  ×  conversão
+// Verificado vs planilha: ID=2.441" → 0.018990 bbl/m  ✓
+function capacidadeBblM(idPol) {
+  // (π/4) × ID² × m × in²→bbl
+  // 1 pol² × 1 m = 0.3048 × 0.00064516 m³ = 0.000196637 m³
+  // 1 m³ = 6.28981 bbl  ⇒ 1 pol²·m = 0.001237 bbl
+  return Math.PI / 4 * idPol * idPol * 0.001237;
+}
+
+// =================== RENDERIZADORES ===================
+const RENDERIZADORES = {
+
+  // ============ VOLUMES ============
+  volumes: () => {
+    const revsOpts = Object.keys(REVESTIMENTOS).map(k => `<option value="${k}">${k}"</option>`).join('');
+    const tubosOpts = Object.keys(TUBOS_PROD).map(k => `<option value="${k}">${k}"</option>`).join('');
+    setTimeout(() => {
+      atualizarPesosRev();
+      atualizarPesosTubo();
+    }, 0);
+    return `
+      <div class="tool-desc">Volume total do poço a partir da combinação revestimento + tubo + profundidade.</div>
+      <div class="form-card">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label class="form-label">Revestimento</label>
+            <select class="form-select" id="v_rev" onchange="atualizarPesosRev()">${revsOpts}</select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Peso revest.</label>
+            <select class="form-select" id="v_revpeso"></select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Tubo</label>
+            <select class="form-select" id="v_tubo" onchange="atualizarPesosTubo()">${tubosOpts}</select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Peso tubo</label>
+            <select class="form-select" id="v_tubopeso"></select>
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:6px">
+          <label class="form-label">Profundidade (metros)</label>
+          <input type="number" class="form-input" id="v_prof" placeholder="ex: 1000" oninput="calcVolumes()">
+        </div>
+        <div id="v_info" class="hint" style="text-align:left;padding:4px 2px;font-style:italic"></div>
+      </div>
+      <div class="result-card" id="v_res"></div>
+    `;
+  },
+
+  // ============ CAPACIDADES ============
+  capacidades: () => {
+    const tubosOpts = Object.keys(TUBOS_PROD).map(k => `<option value="${k}">${k}"</option>`).join('');
+    setTimeout(() => atualizarPesosTuboCap(), 0);
+    return `
+      <div class="tool-desc">Capacidade interna do tubo (bbl/m) a partir do ID.</div>
+      <div class="form-card">
+        <div class="form-grid-2">
+          <div class="form-row">
+            <label class="form-label">Tubo</label>
+            <select class="form-select" id="c_tubo" onchange="atualizarPesosTuboCap()">${tubosOpts}</select>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Peso (lb/pé)</label>
+            <select class="form-select" id="c_peso" onchange="calcCapacidades()"></select>
+          </div>
+        </div>
+      </div>
+      <div class="result-card show" id="c_res">
+        <div class="result-title">Capacidade Interna</div>
+        <div id="c_main"></div>
+      </div>
+    `;
+  },
+
+  // ============ AMORTECIMENTO 1 (por pressão) ============
+  amort1: () => `
+    <div class="tool-desc">Densidade do fluido para amortecimento, a partir da pressão da formação.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Profundidade Vertical (m)</label>
+        <input type="number" class="form-input" id="a1_prof" placeholder="ex: 1500">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Pressão de Formação (psi)</label>
+        <input type="number" class="form-input" id="a1_pf" placeholder="ex: 2100">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Margem de Segurança (psi)</label>
+        <input type="number" class="form-input" id="a1_marg" value="150">
+      </div>
+      <button class="calc-btn" onclick="calcAmort1()">Calcular</button>
+    </div>
+    <div class="result-card" id="a1_res"></div>
+  `,
+
+  // ============ AMORTECIMENTO 2 (por gradiente) ============
+  amort2: () => `
+    <div class="tool-desc">Densidade do fluido a partir do gradiente da formação.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Gradiente da Formação (psi/m)</label>
+        <input type="number" class="form-input" id="a2_grad" step="0.001" placeholder="ex: 1.52">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Profundidade (m)</label>
+        <input type="number" class="form-input" id="a2_prof" placeholder="ex: 1500">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Sobrepressurização (%)</label>
+        <input type="number" class="form-input" id="a2_sobre" value="5">
+      </div>
+      <button class="calc-btn" onclick="calcAmort2()">Calcular</button>
+    </div>
+    <div class="result-card" id="a2_res"></div>
+  `,
+
+  // ============ VAZÃO DE CIRCULAÇÃO ============
+  vazaoCirc: () => `
+    <div class="tool-desc">Vazão de circulação a partir do ID do tubo e velocidade.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Diâmetro Interno (pol)</label>
+        <input type="number" class="form-input" id="vc_id" step="0.001" placeholder="ex: 2.441">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Velocidade (m/s)</label>
+        <input type="number" class="form-input" id="vc_vel" step="0.01" value="1.2">
+      </div>
+      <button class="calc-btn" onclick="calcVazaoCirc()">Calcular</button>
+    </div>
+    <div class="result-card" id="vc_res"></div>
+  `,
+
+  // ============ VAZÃO DIÁRIA ============
+  vazaoDiaria: () => `
+    <div class="tool-desc">Produção diária a partir da vazão medida.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Vazão Medida</label>
+        <input type="number" class="form-input" id="vd_q" step="0.01" placeholder="ex: 5">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Unidade da Vazão</label>
+        <select class="form-select" id="vd_unidade">
+          <option value="bpm">bbl por minuto (bpm)</option>
+          <option value="bph">bbl por hora (bph)</option>
+          <option value="m3h">m³ por hora</option>
+          <option value="lpm">litros por minuto</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Horas operando por dia</label>
+        <input type="number" class="form-input" id="vd_horas" value="24">
+      </div>
+      <button class="calc-btn" onclick="calcVazaoDiaria()">Calcular</button>
+    </div>
+    <div class="result-card" id="vd_res"></div>
+  `,
+
+  // ============ DIFERENCIAL DE PRESSÃO ============
+  difPressao: () => `
+    <div class="tool-desc">Diferencial de pressão (ΔP) entre dois pontos.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Pressão a montante (psi)</label>
+        <input type="number" class="form-input" id="dp_p1" placeholder="ex: 1500">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Pressão a jusante (psi)</label>
+        <input type="number" class="form-input" id="dp_p2" placeholder="ex: 800">
+      </div>
+      <button class="calc-btn" onclick="calcDifPressao()">Calcular ΔP</button>
+    </div>
+    <div class="result-card" id="dp_res"></div>
+  `,
+
+  // ============ FATOR DE FLUTUAÇÃO ============
+  flutuacao: () => `
+    <div class="tool-desc">FF = 1 − (ρfluido / ρaço). Densidade do aço = 65,5 lb/gal (ou 7,85 g/cm³).</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Densidade do Fluido</label>
+        <input type="number" class="form-input" id="ff_dens" step="0.01" placeholder="ex: 1.05">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Unidade</label>
+        <select class="form-select" id="ff_unid">
+          <option value="gcm3">g/cm³</option>
+          <option value="lbgal">lb/gal</option>
+          <option value="lbpe3">lb/pé³</option>
+        </select>
+      </div>
+      <button class="calc-btn" onclick="calcFlutuacao()">Calcular FF</button>
+    </div>
+    <div class="result-card" id="ff_res"></div>
+  `,
+
+  // ============ SLACK-OFF ============
+  slackoff: () => `
+    <div class="tool-desc">Carga necessária pra assentar packer/anchor.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Peso da Coluna no Ar (lb)</label>
+        <input type="number" class="form-input" id="so_peso" placeholder="ex: 8500">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Fator de Flutuação</label>
+        <input type="number" class="form-input" id="so_ff" step="0.01" value="0.87">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Carga p/ Assentar (lb)</label>
+        <input type="number" class="form-input" id="so_carga" placeholder="ex: 15000">
+      </div>
+      <button class="calc-btn" onclick="calcSlackOff()">Calcular</button>
+    </div>
+    <div class="result-card" id="so_res"></div>
+  `,
+
+  // ============ COLCHÃO DE AREIA ============
+  colchaoAreia: () => `
+    <div class="tool-desc">Volume de areia para colchão dentro do revestimento.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Revestimento</label>
+        <select class="form-select" id="ca_rev">
+          <option value="5.5,17,4.892">5 1/2" — 17 lb/pé (ID 4.892)</option>
+          <option value="7,23,6.276">7" — 23 lb/pé (ID 6.276)</option>
+          <option value="7,26,6.184">7" — 26 lb/pé (ID 6.184)</option>
+          <option value="7,29,6.094">7" — 29 lb/pé (ID 6.094)</option>
+          <option value="9.625,40,8.835">9 5/8" — 40 lb/pé (ID 8.835)</option>
+          <option value="9.625,47,8.681">9 5/8" — 47 lb/pé (ID 8.681)</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Altura do Colchão (m)</label>
+        <input type="number" class="form-input" id="ca_alt" placeholder="ex: 10">
+      </div>
+      <button class="calc-btn" onclick="calcColchao()">Calcular Volume</button>
+    </div>
+    <div class="result-card" id="ca_res"></div>
+  `,
+
+  // ============ PINOS DE CISALHAMENTO ============
+  pinoCisalha: () => `
+    <div class="tool-desc">Força necessária para cisalhar pino. F = τ × A × n.</div>
+    <div class="form-card">
+      <div class="form-row">
+        <label class="form-label">Diâmetro do Pino (pol)</label>
+        <input type="number" class="form-input" id="pc_d" step="0.001" placeholder="ex: 0.25">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Tensão de Cisalhamento (psi)</label>
+        <input type="number" class="form-input" id="pc_t" value="60000">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Número de Pinos</label>
+        <input type="number" class="form-input" id="pc_n" value="1">
+      </div>
+      <button class="calc-btn" onclick="calcPinoCis()">Calcular Força</button>
+    </div>
+    <div class="result-card" id="pc_res"></div>
+  `,
+
+  // ============ TABELA REVESTIMENTO ============
+  tabRev: () => {
+    let html = '';
+    Object.keys(REVESTIMENTOS).forEach(diam => {
+      const r = REVESTIMENTOS[diam];
+      Object.keys(r.pesos).forEach(p => {
+        const id = r.pesos[p];
+        html += `<tr><td><b>${diam}"</b></td><td>${p}</td><td>${fmt(id,3)}</td><td>${fmt(capacidadeBblM(id),4)}</td></tr>`;
+      });
+    });
+    return `
+      <div class="tool-desc">Diâmetro nominal × peso → ID interno + capacidade.</div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>OD</th><th>Peso<br>(lb/pé)</th><th>ID<br>(pol)</th><th>Cap.<br>(bbl/m)</th></tr></thead>
+          <tbody>${html}</tbody>
+        </table>
+      </div>
+      <div class="hint">Valores conforme API 5CT — fonte: planilha original.</div>
+    `;
+  },
+
+  // ============ TABELA TUBOS DE PRODUÇÃO ============
+  tabTubos: () => {
+    let html = '';
+    Object.keys(TUBOS_PROD).forEach(diam => {
+      const t = TUBOS_PROD[diam];
+      Object.keys(t.pesos).forEach(p => {
+        const id = t.pesos[p];
+        html += `<tr><td><b>${diam}"</b></td><td>${p}</td><td>${fmt(id,3)}</td><td>${fmt(capacidadeBblM(id),4)}</td></tr>`;
+      });
+    });
+    return `
+      <div class="tool-desc">Tubos API 5CT — OD × peso → ID + capacidade.</div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>OD</th><th>Peso<br>(lb/pé)</th><th>ID<br>(pol)</th><th>Cap.<br>(bbl/m)</th></tr></thead>
+          <tbody>${html}</tbody>
+        </table>
+      </div>
+      <div class="hint">Use a capacidade pra estimar volume interno do tubo (bbl/m × profundidade).</div>
+    `;
+  },
+
+  // ============ TABELA BROCAS ============
+  tabBrocas: () => {
+    const linhas = [
+      ["4 1/2", "9.5",  "4.090", "3.875", "2 3/8\" REG", "3.000 a 3.500"],
+      ["4 1/2", "10.5", "4.052", "3.875", "2 3/8\" REG", "3.000 a 3.500"],
+      ["4 1/2", "11.6", "4.000", "3.875", "2 3/8\" REG", "3.000 a 3.500"],
+      ["4 1/2", "13.5", "3.920", "3.750", "2 3/8\" REG", "3.000 a 3.500"],
+      ["5",     "11.5", "4.560", "4.250", "2 3/8\" REG", "3.000 a 3.500"],
+      ["5",     "13.0", "4.494", "4.250", "2 3/8\" REG", "3.000 a 3.500"],
+      ["5",     "15.0", "4.408", "4.250", "2 3/8\" REG", "3.000 a 3.500"],
+      ["5",     "18.0", "4.276", "4.125", "2 3/8\" REG", "3.000 a 3.500"],
+      ["5 1/2", "13.0", "5.044", "4.750", "2 7/8\" REG", "3.000 a 3.500"],
+      ["5 1/2", "14.0", "5.012", "4.750", "2 7/8\" REG", "3.000 a 3.500"],
+      ["5 1/2", "15.5", "4.950", "4.750", "2 7/8\" REG", "3.000 a 3.500"],
+      ["5 1/2", "17.0", "4.892", "4.750", "2 7/8\" REG", "3.000 a 3.500"],
+      ["5 1/2", "20.0", "4.778", "4.625", "2 7/8\" REG", "3.000 a 3.500"],
+      ["5 1/2", "23.0", "4.670", "4.500", "2 3/8\" REG", "3.000 a 3.500"],
+      ["6",     "15.0", "5.524", "5.375", "3 1/2\" REG", "7.000 a 9.000"],
+      ["6",     "18.0", "5.424", "5.125", "3 1/2\" REG", "7.000 a 9.000"],
+      ["6",     "20.0", "5.352", "5.125", "3 1/2\" REG", "7.000 a 9.000"],
+      ["6 5/8", "17.0", "6.135", "6.000", "3 1/2\" REG", "7.000 a 9.000"],
+      ["6 5/8", "20.0", "6.049", "5.875", "3 1/2\" REG", "7.000 a 9.000"],
+      ["6 5/8", "24.0", "5.921", "5.625", "3 1/2\" REG", "7.000 a 9.000"],
+      ["7",     "17.0", "6.538", "6.250", "3 1/2\" REG", "7.000 a 9.000"],
+      ["7",     "20.0", "6.456", "6.250", "3 1/2\" REG", "7.000 a 9.000"],
+      ["7",     "23.0", "6.366", "6.125", "3 1/2\" REG", "7.000 a 9.000"],
+      ["7",     "26.0", "6.276", "6.000", "3 1/2\" REG", "7.000 a 9.000"],
+      ["7",     "29.0", "6.184", "6.000", "3 1/2\" REG", "7.000 a 9.000"]
+    ];
+    return `
+      <div class="tool-desc">Broca recomendada por revestimento (OD × peso).</div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Rev.</th><th>Peso</th><th>ID</th><th>Broca</th><th>Conexão</th><th>Torque</th></tr></thead>
+          <tbody>
+            ${linhas.map(l => `<tr><td><b>${l[0]}"</b></td><td>${l[1]}</td><td>${l[2]}</td><td>${l[3]}"</td><td>${l[4]}</td><td>${l[5]}<br><span style="font-size:9px;color:var(--text-dim)">lb·pé</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
+  },
+
+  // ============ TABELA PACKERS ============
+  tabPacker: () => {
+    const linhas = [
+      ["3 1/2", "9.3",       "Convencional"],
+      ["5",     "15",        "43-C"],
+      ["5",     "15 a 18",   "43-B"],
+      ["5",     "18 a 21",   "43-A2"],
+      ["5 1/2", "13",        "45-B"],
+      ["5 1/2", "14",        "45-B"],
+      ["5 1/2", "15.5",      "45-B / 45-A4"],
+      ["5 1/2", "17",        "45-A4"],
+      ["5 1/2", "20",        "45-A4 / 45-A2"],
+      ["5 1/2", "23",        "45-A2"],
+      ["7",     "23",        "47-B4"],
+      ["7",     "26",        "47-B4 / 47-B2"],
+      ["7",     "29",        "47-B2"]
+    ];
+    return `
+      <div class="tool-desc">Packer recomendado pelo OD e peso do revestimento.</div>
+      <div class="table-wrap">
+        <table class="tbl">
+          <thead><tr><th>Revestimento OD</th><th>Peso (lb/pé)</th><th>Packer</th></tr></thead>
+          <tbody>${linhas.map(l => `<tr><td><b>${l[0]}"</b></td><td>${l[1]}</td><td>${l[2]}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="form-card" style="margin-top:14px">
+        <div class="form-label" style="margin-bottom:8px">📝 Diferenças dos packers</div>
+        <div style="font-size:12px;color:var(--text-soft);line-height:1.6">
+          <b>45-A4:</b> cunhas, anéis e borrachas mais finas.<br>
+          <b>45-B:</b> cunhas, anéis e borrachas mais grossas.
+        </div>
+      </div>
+    `;
+  },
+
+  // ============ CONVERSÕES ============
+  conversoes: () => `
+    <div class="tool-desc">Conversões entre as unidades mais usadas em campo.</div>
+
+    <div class="form-card">
+      <div class="form-label" style="margin-bottom:10px">📏 Comprimento</div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_m" placeholder="metros" oninput="convertLen('m')">
+      </div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_pe" placeholder="pés (ft)" oninput="convertLen('pe')">
+      </div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_in" placeholder="polegadas (in)" oninput="convertLen('in')">
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-label" style="margin-bottom:10px">⚖️ Pressão</div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_psi" placeholder="psi" oninput="convertPress('psi')">
+      </div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_kgf" placeholder="kgf/cm²" oninput="convertPress('kgf')">
+      </div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_bar" placeholder="bar" oninput="convertPress('bar')">
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-label" style="margin-bottom:10px">🛢️ Volume</div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_bbl" placeholder="barris (bbl)" oninput="convertVol('bbl')">
+      </div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_m3" placeholder="m³" oninput="convertVol('m3')">
+      </div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_l" placeholder="litros" oninput="convertVol('l')">
+      </div>
+    </div>
+
+    <div class="form-card">
+      <div class="form-label" style="margin-bottom:10px">⚙️ Massa</div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_lb" placeholder="libras (lb)" oninput="convertMass('lb')">
+      </div>
+      <div class="form-row">
+        <input type="number" class="form-input" id="conv_kg" placeholder="kg" oninput="convertMass('kg')">
+      </div>
+    </div>
+  `
+};
+
+// =================== HELPERS DE SELECT (volumes/capacidades) ===================
+function atualizarPesosRev() {
+  const rev = document.getElementById('v_rev').value;
+  const pesos = Object.keys(REVESTIMENTOS[rev].pesos);
+  document.getElementById('v_revpeso').innerHTML = pesos.map(p => `<option value="${p}">${p} lb/pé</option>`).join('');
+  document.getElementById('v_revpeso').onchange = calcVolumes;
+  calcVolumes();
+}
+function atualizarPesosTubo() {
+  const t = document.getElementById('v_tubo').value;
+  const pesos = Object.keys(TUBOS_PROD[t].pesos);
+  document.getElementById('v_tubopeso').innerHTML = pesos.map(p => `<option value="${p}">${p} lb/pé</option>`).join('');
+  document.getElementById('v_tubopeso').onchange = calcVolumes;
+  calcVolumes();
+}
+function atualizarPesosTuboCap() {
+  const t = document.getElementById('c_tubo').value;
+  const pesos = Object.keys(TUBOS_PROD[t].pesos);
+  document.getElementById('c_peso').innerHTML = pesos.map(p => `<option value="${p}">${p} lb/pé</option>`).join('');
+  calcCapacidades();
+}
+
+// =================== CÁLCULOS ===================
+function calcVolumes() {
+  const rev = document.getElementById('v_rev')?.value;
+  const revpeso = parseFloat(document.getElementById('v_revpeso')?.value);
+  const tubo = document.getElementById('v_tubo')?.value;
+  const tubopeso = parseFloat(document.getElementById('v_tubopeso')?.value);
+  const prof = parseFloat(document.getElementById('v_prof')?.value);
+
+  if (!rev || !tubo || isNaN(revpeso) || isNaN(tubopeso)) return;
+
+  const idRev = REVESTIMENTOS[rev].pesos[revpeso];
+  const odTubo = TUBOS_PROD[tubo].od;
+  const idTubo = TUBOS_PROD[tubo].pesos[tubopeso];
+
+  document.getElementById('v_info').textContent =
+    `Rev. ${rev}" ID=${fmt(idRev,3)} · Tubo ${tubo}" OD=${fmt(odTubo,3)} ID=${fmt(idTubo,3)}`;
+
+  if (isNaN(prof) || prof <= 0) {
+    document.getElementById('v_res').classList.remove('show');
+    return;
+  }
+
+  // bbl/m
+  const capRev = capacidadeBblM(idRev);   // capacidade interna do revestimento
+  const capTubo = capacidadeBblM(idTubo); // interna do tubo
+  const capOdTubo = capacidadeBblM(odTubo);
+  const capAnular = capRev - capOdTubo;   // anular = (área interna rev) − (área externa tubo)
+  const capAnularTubo = capAnular + capTubo;
+
+  const volRev = capRev * prof;
+  const volTubo = capTubo * prof;
+  const volAnular = capAnular * prof;
+  const volTotal = capAnularTubo * prof;
+
+  document.getElementById('v_res').classList.add('show');
+  document.getElementById('v_res').innerHTML = `
+    <div class="result-title">Para ${prof.toLocaleString('pt-BR')} m</div>
+    <div class="result-main">${fmt(volTotal,2)}<span class="result-unit">bbl (anular + tubo)</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Revestimento</span><span class="val">${fmt(volRev,2)} bbl</span></div>
+      <div class="result-row"><span class="lbl">Tubo (interno)</span><span class="val">${fmt(volTubo,2)} bbl</span></div>
+      <div class="result-row"><span class="lbl">Anular</span><span class="val">${fmt(volAnular,2)} bbl</span></div>
+      <div class="result-row"><span class="lbl">Em m³</span><span class="val">${fmt(volTotal/6.28981,2)} m³</span></div>
+    </div>
+  `;
+}
+
+function calcCapacidades() {
+  const tubo = document.getElementById('c_tubo')?.value;
+  const peso = parseFloat(document.getElementById('c_peso')?.value);
+  if (!tubo || isNaN(peso)) return;
+  const od = TUBOS_PROD[tubo].od;
+  const id = TUBOS_PROD[tubo].pesos[peso];
+  const capM = capacidadeBblM(id);
+  document.getElementById('c_main').innerHTML = `
+    <div class="result-main">${fmt(capM,4)}<span class="result-unit">bbl/m</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Tubo</span><span class="val">${tubo}"  ·  ${peso} lb/pé</span></div>
+      <div class="result-row"><span class="lbl">OD</span><span class="val">${fmt(od,3)} pol</span></div>
+      <div class="result-row"><span class="lbl">ID</span><span class="val">${fmt(id,3)} pol</span></div>
+      <div class="result-row"><span class="lbl">Por 1.000 m</span><span class="val">${fmt(capM*1000,2)} bbl</span></div>
+      <div class="result-row"><span class="lbl">Em L/m</span><span class="val">${fmt(capM*158.987,2)} L/m</span></div>
+    </div>
+  `;
+}
+
+function calcAmort1() {
+  const prof = parseFloat(document.getElementById('a1_prof').value);
+  const pf   = parseFloat(document.getElementById('a1_pf').value);
+  const marg = parseFloat(document.getElementById('a1_marg').value) || 0;
+  if (isNaN(prof) || isNaN(pf) || prof <= 0) {
+    document.getElementById('a1_res').classList.remove('show'); return;
+  }
+  // ρ (lb/gal) = (Pf + margem) / (0.052 × prof_em_pés)
+  const profPe = m2pe(prof);
+  const dens_lbgal = (pf + marg) / (0.052 * profPe);
+  // conversões
+  const dens_gcm3 = dens_lbgal * 0.11982643;
+  const dens_lbpe3 = dens_lbgal * 7.480519;
+  document.getElementById('a1_res').classList.add('show');
+  document.getElementById('a1_res').innerHTML = `
+    <div class="result-title">Densidade Necessária</div>
+    <div class="result-main">${fmt(dens_lbgal,2)}<span class="result-unit">lb/gal</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Em g/cm³</span><span class="val">${fmt(dens_gcm3,3)}</span></div>
+      <div class="result-row"><span class="lbl">Em lb/pé³</span><span class="val">${fmt(dens_lbpe3,2)}</span></div>
+      <div class="result-row"><span class="lbl">Pressão total</span><span class="val">${fmt(pf+marg,0)} psi</span></div>
+      <div class="result-row"><span class="lbl">Profundidade</span><span class="val">${prof.toLocaleString('pt-BR')} m (${fmt(profPe,0)} pés)</span></div>
+    </div>
+  `;
+}
+
+function calcAmort2() {
+  const grad = parseFloat(document.getElementById('a2_grad').value);
+  const prof = parseFloat(document.getElementById('a2_prof').value);
+  const sobre = parseFloat(document.getElementById('a2_sobre').value) || 0;
+  if (isNaN(grad) || isNaN(prof) || prof <= 0) {
+    document.getElementById('a2_res').classList.remove('show'); return;
+  }
+  const pf = grad * prof;
+  const pfSobre = pf * (1 + sobre/100);
+  const profPe = m2pe(prof);
+  const dens_lbgal = pfSobre / (0.052 * profPe);
+  document.getElementById('a2_res').classList.add('show');
+  document.getElementById('a2_res').innerHTML = `
+    <div class="result-title">Densidade Necessária</div>
+    <div class="result-main">${fmt(dens_lbgal,2)}<span class="result-unit">lb/gal</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Pressão formação</span><span class="val">${fmt(pf,0)} psi</span></div>
+      <div class="result-row"><span class="lbl">Com sobrepres. (+${sobre}%)</span><span class="val">${fmt(pfSobre,0)} psi</span></div>
+      <div class="result-row"><span class="lbl">Em g/cm³</span><span class="val">${fmt(dens_lbgal*0.11982643,3)}</span></div>
+    </div>
+  `;
+}
+
+function calcVazaoCirc() {
+  const id = parseFloat(document.getElementById('vc_id').value);
+  const v  = parseFloat(document.getElementById('vc_vel').value);
+  if (isNaN(id) || isNaN(v) || id <= 0) {
+    document.getElementById('vc_res').classList.remove('show'); return;
+  }
+  // Área (m²) = π/4 × (ID * 0.0254)²
+  const area_m2 = Math.PI/4 * Math.pow(id * 0.0254, 2);
+  const Q_m3s = area_m2 * v;
+  const Q_m3min = Q_m3s * 60;
+  const Q_bpm = Q_m3min * 6.28981;
+  const Q_bph = Q_bpm * 60;
+  const Q_lmin = Q_m3min * 1000;
+  document.getElementById('vc_res').classList.add('show');
+  document.getElementById('vc_res').innerHTML = `
+    <div class="result-title">Vazão Calculada</div>
+    <div class="result-main">${fmt(Q_bpm,2)}<span class="result-unit">bbl/min</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Em bbl/h</span><span class="val">${fmt(Q_bph,1)}</span></div>
+      <div class="result-row"><span class="lbl">Em m³/h</span><span class="val">${fmt(Q_m3min*60,2)}</span></div>
+      <div class="result-row"><span class="lbl">Em L/min</span><span class="val">${fmt(Q_lmin,0)}</span></div>
+      <div class="result-row"><span class="lbl">Área da seção</span><span class="val">${fmt(area_m2*10000,2)} cm²</span></div>
+    </div>
+  `;
+}
+
+function calcVazaoDiaria() {
+  const q = parseFloat(document.getElementById('vd_q').value);
+  const u = document.getElementById('vd_unidade').value;
+  const h = parseFloat(document.getElementById('vd_horas').value) || 24;
+  if (isNaN(q) || q <= 0) { document.getElementById('vd_res').classList.remove('show'); return; }
+  // converter pra bbl/min
+  let bpm;
+  if (u === 'bpm') bpm = q;
+  else if (u === 'bph') bpm = q/60;
+  else if (u === 'm3h') bpm = (q*6.28981)/60;
+  else if (u === 'lpm') bpm = q/158.987;
+  const bblDia = bpm * 60 * h;
+  const m3Dia = bblDia / 6.28981;
+  document.getElementById('vd_res').classList.add('show');
+  document.getElementById('vd_res').innerHTML = `
+    <div class="result-title">Produção Diária</div>
+    <div class="result-main">${fmt(bblDia,0)}<span class="result-unit">bbl/dia</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Em m³/dia</span><span class="val">${fmt(m3Dia,1)}</span></div>
+      <div class="result-row"><span class="lbl">Vazão</span><span class="val">${fmt(bpm,3)} bbl/min</span></div>
+      <div class="result-row"><span class="lbl">Horas/dia</span><span class="val">${h} h</span></div>
+    </div>
+  `;
+}
+
+function calcDifPressao() {
+  const p1 = parseFloat(document.getElementById('dp_p1').value);
+  const p2 = parseFloat(document.getElementById('dp_p2').value);
+  if (isNaN(p1) || isNaN(p2)) { document.getElementById('dp_res').classList.remove('show'); return; }
+  const dp = p1 - p2;
+  document.getElementById('dp_res').classList.add('show');
+  document.getElementById('dp_res').innerHTML = `
+    <div class="result-title">Diferencial</div>
+    <div class="result-main">${fmt(dp,0)}<span class="result-unit">psi</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Em kgf/cm²</span><span class="val">${fmt(dp*0.0703,2)}</span></div>
+      <div class="result-row"><span class="lbl">Em bar</span><span class="val">${fmt(dp/14.5038,2)}</span></div>
+      <div class="result-row"><span class="lbl">P. maior</span><span class="val">${fmt(Math.max(p1,p2),0)} psi</span></div>
+      <div class="result-row"><span class="lbl">P. menor</span><span class="val">${fmt(Math.min(p1,p2),0)} psi</span></div>
+    </div>
+  `;
+}
+
+function calcFlutuacao() {
+  const d = parseFloat(document.getElementById('ff_dens').value);
+  const u = document.getElementById('ff_unid').value;
+  if (isNaN(d) || d <= 0) { document.getElementById('ff_res').classList.remove('show'); return; }
+  // converter pra g/cm³
+  let gcm3;
+  if (u === 'gcm3') gcm3 = d;
+  else if (u === 'lbgal') gcm3 = d * 0.11982643;
+  else if (u === 'lbpe3') gcm3 = d * 0.0160185;
+  const ff = 1 - (gcm3 / 7.85);
+  document.getElementById('ff_res').classList.add('show');
+  document.getElementById('ff_res').innerHTML = `
+    <div class="result-title">Fator de Flutuação</div>
+    <div class="result-main">${fmt(ff,4)}<span class="result-unit">(adim.)</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Densidade fluido</span><span class="val">${fmt(gcm3,3)} g/cm³</span></div>
+      <div class="result-row"><span class="lbl">Densidade aço</span><span class="val">7.850 g/cm³</span></div>
+      <div class="result-row"><span class="lbl">Peso flutuante = Peso × FF</span><span class="val">×${fmt(ff,4)}</span></div>
+    </div>
+  `;
+}
+
+function calcSlackOff() {
+  const peso = parseFloat(document.getElementById('so_peso').value);
+  const ff = parseFloat(document.getElementById('so_ff').value);
+  const carga = parseFloat(document.getElementById('so_carga').value);
+  if (isNaN(peso) || isNaN(ff) || isNaN(carga)) { document.getElementById('so_res').classList.remove('show'); return; }
+  const pesoFlut = peso * ff;
+  const slack = pesoFlut - carga;
+  const indicacao = slack > 0 ? 'PESO MAIOR — desça mais peso' : 'TENSÃO — puxe a coluna';
+  document.getElementById('so_res').classList.add('show');
+  document.getElementById('so_res').innerHTML = `
+    <div class="result-title">Slack-Off Calculado</div>
+    <div class="result-main">${fmt(Math.abs(slack),0)}<span class="result-unit">lb (${slack>=0?'compressão':'tração'})</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Peso no ar</span><span class="val">${fmt(peso,0)} lb</span></div>
+      <div class="result-row"><span class="lbl">Peso flutuante</span><span class="val">${fmt(pesoFlut,0)} lb</span></div>
+      <div class="result-row"><span class="lbl">Carga p/ assentar</span><span class="val">${fmt(carga,0)} lb</span></div>
+      <div class="result-row"><span class="lbl">Indicação</span><span class="val">${indicacao}</span></div>
+    </div>
+  `;
+}
+
+function calcColchao() {
+  const v = document.getElementById('ca_rev').value.split(',');
+  const idPol = parseFloat(v[2]);
+  const alt = parseFloat(document.getElementById('ca_alt').value);
+  if (isNaN(alt) || alt <= 0) { document.getElementById('ca_res').classList.remove('show'); return; }
+  const capBblM = capacidadeBblM(idPol);
+  const volBbl = capBblM * alt;
+  const volM3 = volBbl / 6.28981;
+  const volL = volM3 * 1000;
+  document.getElementById('ca_res').classList.add('show');
+  document.getElementById('ca_res').innerHTML = `
+    <div class="result-title">Volume de Areia</div>
+    <div class="result-main">${fmt(volBbl,3)}<span class="result-unit">bbl</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Em m³</span><span class="val">${fmt(volM3,3)}</span></div>
+      <div class="result-row"><span class="lbl">Em litros</span><span class="val">${fmt(volL,1)}</span></div>
+      <div class="result-row"><span class="lbl">Revestimento</span><span class="val">${v[0]}" — ${v[1]} lb/pé</span></div>
+      <div class="result-row"><span class="lbl">ID interno</span><span class="val">${idPol} pol</span></div>
+    </div>
+  `;
+}
+
+function calcPinoCis() {
+  const d = parseFloat(document.getElementById('pc_d').value);
+  const t = parseFloat(document.getElementById('pc_t').value);
+  const n = parseInt(document.getElementById('pc_n').value) || 1;
+  if (isNaN(d) || isNaN(t) || d <= 0) { document.getElementById('pc_res').classList.remove('show'); return; }
+  const area = Math.PI/4 * d * d;
+  const forcaUm = area * t;
+  const forcaTotal = forcaUm * n;
+  document.getElementById('pc_res').classList.add('show');
+  document.getElementById('pc_res').innerHTML = `
+    <div class="result-title">Força de Cisalhamento</div>
+    <div class="result-main">${fmt(forcaTotal,0)}<span class="result-unit">lb (${n} pino${n>1?'s':''})</span></div>
+    <div style="margin-top:14px">
+      <div class="result-row"><span class="lbl">Por pino</span><span class="val">${fmt(forcaUm,0)} lb</span></div>
+      <div class="result-row"><span class="lbl">Em kgf</span><span class="val">${fmt(forcaTotal*0.4536,0)}</span></div>
+      <div class="result-row"><span class="lbl">Área de cada pino</span><span class="val">${fmt(area,4)} pol²</span></div>
+      <div class="result-row"><span class="lbl">Diâmetro</span><span class="val">${d} pol (${fmt(d*25.4,1)} mm)</span></div>
+    </div>
+  `;
+}
+
+// =================== CONVERSÕES ===================
+function convertLen(from) {
+  const m_val  = parseFloat(document.getElementById('conv_m').value);
+  const pe_val = parseFloat(document.getElementById('conv_pe').value);
+  const in_val = parseFloat(document.getElementById('conv_in').value);
+  let m;
+  if (from === 'm')  m = m_val;
+  if (from === 'pe') m = pe_val * 0.3048;
+  if (from === 'in') m = in_val * 0.0254;
+  if (isNaN(m)) return;
+  if (from !== 'm')  document.getElementById('conv_m').value  = fmtNumRaw(m);
+  if (from !== 'pe') document.getElementById('conv_pe').value = fmtNumRaw(m/0.3048);
+  if (from !== 'in') document.getElementById('conv_in').value = fmtNumRaw(m/0.0254);
+}
+function convertPress(from) {
+  const psi = parseFloat(document.getElementById('conv_psi').value);
+  const kgf = parseFloat(document.getElementById('conv_kgf').value);
+  const bar = parseFloat(document.getElementById('conv_bar').value);
+  let p_psi;
+  if (from === 'psi') p_psi = psi;
+  if (from === 'kgf') p_psi = kgf * 14.2233;
+  if (from === 'bar') p_psi = bar * 14.5038;
+  if (isNaN(p_psi)) return;
+  if (from !== 'psi') document.getElementById('conv_psi').value = fmtNumRaw(p_psi);
+  if (from !== 'kgf') document.getElementById('conv_kgf').value = fmtNumRaw(p_psi/14.2233);
+  if (from !== 'bar') document.getElementById('conv_bar').value = fmtNumRaw(p_psi/14.5038);
+}
+function convertVol(from) {
+  const bbl = parseFloat(document.getElementById('conv_bbl').value);
+  const m3  = parseFloat(document.getElementById('conv_m3').value);
+  const l   = parseFloat(document.getElementById('conv_l').value);
+  let v_m3;
+  if (from === 'bbl') v_m3 = bbl / 6.28981;
+  if (from === 'm3')  v_m3 = m3;
+  if (from === 'l')   v_m3 = l / 1000;
+  if (isNaN(v_m3)) return;
+  if (from !== 'bbl') document.getElementById('conv_bbl').value = fmtNumRaw(v_m3*6.28981);
+  if (from !== 'm3')  document.getElementById('conv_m3').value  = fmtNumRaw(v_m3);
+  if (from !== 'l')   document.getElementById('conv_l').value   = fmtNumRaw(v_m3*1000);
+}
+function convertMass(from) {
+  const lb = parseFloat(document.getElementById('conv_lb').value);
+  const kg = parseFloat(document.getElementById('conv_kg').value);
+  let kg_v;
+  if (from === 'lb') kg_v = lb * 0.4536;
+  if (from === 'kg') kg_v = kg;
+  if (isNaN(kg_v)) return;
+  if (from !== 'lb') document.getElementById('conv_lb').value = fmtNumRaw(kg_v/0.4536);
+  if (from !== 'kg') document.getElementById('conv_kg').value = fmtNumRaw(kg_v);
+}
+function fmtNumRaw(n) {
+  if (Math.abs(n) >= 100) return n.toFixed(2);
+  if (Math.abs(n) >= 1)   return n.toFixed(3);
+  return n.toFixed(4);
+}
+
+// =================== INIT ===================
+renderHome();
+</script>
+
+</body>
+</html>
